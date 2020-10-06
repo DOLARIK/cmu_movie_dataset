@@ -22,7 +22,7 @@ def read_plot_summaries(path_to_plot_summaries):
 			wiki_movie_ids.append(wiki_movie_id)
 			plot_summaries_dict[wiki_movie_id] = plot_summary
 
-	return wiki_movie_ids, plot_summaries_dict
+	return sorted(wiki_movie_ids), plot_summaries_dict
 
 def read_movie_genre(path_to_movie_metadata):
 	"""Reads movie genres from movie.metadata.tsv
@@ -54,6 +54,33 @@ def read_movie_genre(path_to_movie_metadata):
 
 	return genre_dict, sorted(all_genres)
 			
+def combine_plot_summaries_and_genres(wiki_movie_ids, plot_summaries_dict, movie_genres_dict):
+	"""Combines plot summaries and respective list of genres into one list.
+
+	# Arguments: 
+		wiki_movie_ids: list of strings, list containing wikipedia movie ids.
+		plot_summaries_dict: dict, dictionary that maps wiki movie ids to 
+			plot summaries.
+		movie_genres_dict: dict, dictionary that maps wiki movie ids to 
+			genres of that movie
+
+	# Returns:
+		plot_summaries_genre_dict: dict, dictionary that maps movie ids to 
+			plot and genres
+
+	"""
+	plot_summaries_genre_dict = {}
+
+	for movie_id in wiki_movie_ids:
+		try:
+			plot_summaries_genre_dict[movie_id] =  {
+				'plot': plot_summaries_dict[movie_id],
+				'genres': movie_genres_dict[movie_id]
+			}
+		except Exception as e:
+			print('WARNING: No movie found with id:', e, 'in movie_genres_dict')
+
+	return plot_summaries_genre_dict
 
 
 
@@ -61,6 +88,10 @@ if __name__ == "__main__":
 	movie_ids, plot_summaries_dict = read_plot_summaries('../../MovieSummaries/plot_summaries.txt')
 
 	genre_dict, all_genres = read_movie_genre('../../MovieSummaries/movie.metadata.tsv')
+
+	plot_summaries_genre_dict = combine_plot_summaries_and_genres(movie_ids, plot_summaries_dict, genre_dict)
+
+	# print(plot_summaries_genre_dict, len(plot_summaries_genre_dict))
 
 	# not_found = []
 
