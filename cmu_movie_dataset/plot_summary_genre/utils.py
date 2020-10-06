@@ -27,6 +27,25 @@ def read_plot_summaries(path_to_plot_summaries):
 
 	return sorted(wiki_movie_ids), plot_summaries_dict
 
+def genre_index_genre_map(all_genres):
+	"""Generate dictionries that map indices to genres and vice versa.
+
+	# Arguments:
+		all_genres: set of srtings, set of all genres
+
+	# Returns:
+		genre_indices: dict, maps genres to indices
+		indices_genre: dict, maps indices to genres
+	"""
+	genre_indices = {}
+	indices_genre = {}
+
+	for idx, genre in enumerate(all_genres):
+		genre_indices[genre] = idx
+		indices_genre[idx] = genre 
+
+	return genre_indices, indices_genre
+
 def read_movie_genre(path_to_movie_metadata):
 	"""Reads movie genres from movie.metadata.tsv
 
@@ -36,6 +55,9 @@ def read_movie_genre(path_to_movie_metadata):
 	# Returns:
 		genre_dict: dict, dictionary that maps wiki movie ids
 			to movie genres
+		all_genres: set of strings, set of all genres
+		genre_indices: dict, maps genre to index
+		indices_genre: dict, maps index to genre
 	"""
 	genre_dict = {}
 	all_genres = set()
@@ -54,8 +76,9 @@ def read_movie_genre(path_to_movie_metadata):
 
 			genre_dict[wiki_movie_id] = genre_values
 
+	genre_indices, indices_genre = genre_index_genre_map(all_genres)
 
-	return genre_dict, sorted(all_genres)
+	return genre_dict, sorted(all_genres), genre_indices, indices_genre
 			
 def combine_plot_summaries_and_genres(wiki_movie_ids, plot_summaries_dict, movie_genres_dict):
 	"""Combines plot summaries and respective list of genres into one list.
