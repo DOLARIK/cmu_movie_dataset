@@ -6,3 +6,15 @@ MovieSummaries
 
 # Python cache
 *.pyc
+ 
+*.DS_Store
+*.pyc
+dist/*
+build/*
+tags
+cmu_movie_dataset.egg-info
+
+# test-related
+.coverage
+.cache
+.pytest_cache
