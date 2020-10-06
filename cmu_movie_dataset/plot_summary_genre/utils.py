@@ -79,6 +79,20 @@ def read_movie_genre(path_to_movie_metadata):
 	genre_indices, indices_genre = genre_index_genre_map(all_genres)
 
 	return genre_dict, sorted(all_genres), genre_indices, indices_genre
+
+def movie_ids_subset(movie_ids, split):
+	"""Based on the split get subset of movie_ids
+
+	# Arguments: 
+		movie_ids: list, list of all movie_ids
+		split: tuple of floats, contains start percentage and stop percentage
+
+	# Returns:
+		movie_ids_subset: list, list of subset of movie ids
+	"""
+	num_files = len(movie_ids)
+	start, stop = int(split[0] * num_files), int(split[1] * num_files)
+	return movie_ids[start: stop]
 			
 def combine_plot_summaries_and_genres(wiki_movie_ids, plot_summaries_dict, movie_genres_dict):
 	"""Combines plot summaries and respective list of genres into one list.
