@@ -3,3 +3,6 @@ MovieSummaries
 
 # TAR GZ
 *.tar.gz
+
+# Python cache
+*.pyc
