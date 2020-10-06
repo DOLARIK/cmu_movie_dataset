@@ -1,5 +1,8 @@
 import csv
 import json
+import re
+
+TAG_RE = re.compile(r'<[^>]+>')
 
 def read_plot_summaries(path_to_plot_summaries):
 	"""Reads plot_summaries.txt.
@@ -78,9 +81,39 @@ def combine_plot_summaries_and_genres(wiki_movie_ids, plot_summaries_dict, movie
 				'genres': movie_genres_dict[movie_id]
 			}
 		except Exception as e:
-			print('WARNING: No movie found with id:', e, 'in movie_genres_dict')
+			('WARNING: No movie found with id:', e, 'in movie_genres_dict')
 
 	return plot_summaries_genre_dict
+
+def remove_tags(text):
+	"""Removes Tags
+
+	# Arguments:
+		text: str, raw text
+
+	# Returns
+		text without tags
+	"""
+	return TAG_RE.sub('', text)
+
+def clean_plot_summary(raw_plot_summary):
+	"""Cleans plot summaries.
+
+	# Arguments:
+		raw_plot_summary: str, plot summary text
+
+	# Returns:
+		clean_plot_summary: str, cleaned plot summary
+	"""
+	sample = raw_plot_summary.lower()
+
+	sample = remove_tags(sample)
+	sample = re.sub('[^a-zA-Z]', ' ', sample)
+	sample = re.sub(r"\s+[a-zA-Z]\s+", ' ', sample)
+	clean_plot_summary = re.sub(r'\s+', ' ', sample)
+		
+	return clean_plot_summary
+
 
 
 
@@ -91,20 +124,15 @@ if __name__ == "__main__":
 
 	plot_summaries_genre_dict = combine_plot_summaries_and_genres(movie_ids, plot_summaries_dict, genre_dict)
 
-	# print(plot_summaries_genre_dict, len(plot_summaries_genre_dict))
+	import random
 
-	# not_found = []
+	sample = plot_summaries_dict[movie_ids[random.randint(0, len(movie_ids))]]
 
-	# for movie_id in movie_ids:
-	# 	try:
-	# 		{
-	# 			'Plot':plot_summaries_dict[movie_id],
-	# 			'Genre':genre_dict[movie_id]
-	# 			}
-	# 	except Exception as e:
-	# 		not_found.append(e)
-
-	# print(not_found, len(not_found))
+	print(
+		sample, '\n\n',
+		clean_plot_summary(sample)
+		)
+	
 
 
 
