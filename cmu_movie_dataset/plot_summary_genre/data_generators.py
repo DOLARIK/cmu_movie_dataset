@@ -1,5 +1,6 @@
 from tensorflow.keras.utils import Sequence
 import os
+from abc import abstractmethod
 
 from utils import (read_plot_summaries, 
 				   read_movie_genre,
@@ -16,7 +17,7 @@ class BaseDataGenerator(Sequence):
 				 max_length = 128,
 				 padding = 'max_length',
 				 truncation = True,
-				 custom_transform = None,
+				 custom_transforms = None,
 				 target_encoder = None,
 				 validation_split = 0,
 				 seed = None,
@@ -25,14 +26,19 @@ class BaseDataGenerator(Sequence):
 		self.movie_ids = movie_ids
 		self.plot_summary_genre_dict = plot_summary_genre_dict
 
+		self.num_samples = len(movie_ids)
+
 		self.batch_size = batch_size
 		self.shuffle = shuffle
 
 		self.validation_split = validation_split
 		self.seed = seed
 
-		self.custom_transform = custom_transform
+		self.custom_transforms = custom_transform
 		self.target_encoder = target_encoder
+
+		self.index_array = None
+		self.total_batches_seen = 0
 		
 		self.max_length = max_length
 		self.padding = padding
@@ -53,7 +59,72 @@ class BaseDataGenerator(Sequence):
 
 		return cls(wiki_movie_ids, plot_summaries_genres_dict, **kwargs)
 
-	
+	def set_index_array(self):
+		self.index_array = np.arange(self.num_samples)
+		if self.shuffle:
+			self.index_array = np.random.permutation(self.num_samples)
+
+	def __len__(self):
+		return (self.num_samples + self.batch_size + 1)//self.batch_size
+
+	def __getitem__(self, idx):
+		if self.seed is not None:
+			np.random.seed(self.seed + self.total_batches_seen)
+
+		self.total_batches_seen += 1
+
+		if self.index_array is None:
+			self.set_index_array()
+
+		index_array = self.index_array[self.batch_size*idx : self.batch_size*(idx + 1)]
+
+		return self._get_batches(index_array)
+
+	def _get_batches(self, index_array):
+		batch_x, batch_y = self._get_sample_batches(index_array)
+		batch_x, batch_y = self._encode_sample_batches(batch_x, batch_y)
+
+		return batch_x, batch_y
+
+	def _get_sample_batches(self, index_array):
+		batch_x, batch_y = [], []
+
+		for x, y in self._get_sample_pair(index_array):
+			batch_x.append(x)
+			batch_y.append(y)
+
+		return batch_x, batch_y
+
+	def _get_sample_pair(self, index):
+		for i in index:
+			plot_summary = self.plot_summaries_genres_dict[self.movie_ids[i]]['plot']
+			genres = self.plot_summaries_genres_dict[self.movie_ids[i]]['genres']
+
+			if self.custom_transforms:
+				for custom_transform in self.custom_transforms:
+					plot_summary = custom_transform(plot_summary)
+
+			yield plot_summary, genres
+
+	def _encode_sample_batches(self, batch_x, batch_y):
+		batch_x = self._encode_features(batch_x)
+		batch_y = self._encode_targets(batch_y)
+
+		return batch_x, batch_y
+
+	@abstractmethod
+	def _encode_features(self):
+		raise NotImplementedError
+
+	@abstractmethod
+	def _encode_targets(self):
+		raise NotImplementedError
+
+	@abstractmethod
+	def set_tokenizer(self):
+		raise NotImplementedError
+
+
 
 
 

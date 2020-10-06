@@ -115,8 +115,6 @@ def clean_plot_summary(raw_plot_summary):
 	return clean_plot_summary
 
 
-
-
 if __name__ == "__main__":
 	movie_ids, plot_summaries_dict = read_plot_summaries('../../MovieSummaries/plot_summaries.txt')
 
