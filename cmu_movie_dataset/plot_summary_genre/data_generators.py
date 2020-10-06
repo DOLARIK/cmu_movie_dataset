@@ -2,7 +2,7 @@ from tensorflow.keras.utils import Sequence
 import os
 from abc import abstractmethod
 
-from utils import (read_plot_summaries, 
+from .utils import (read_plot_summaries, 
 				   read_movie_genre,
 				   combine_plot_summaries_and_genres,
 				   clean_plot_summary, 
