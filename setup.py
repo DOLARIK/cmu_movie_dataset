@@ -9,7 +9,7 @@ with open('README.md') as f:
 
 setup(
     name='cmu_movie_dataset',
-    version='0.1.0',
+    version='0.1.1',
     description='For loading CMU Movie Dataset in python',
     long_description=readme,
     author='Divyanshu Gupta',
@@ -18,3 +18,5 @@ setup(
     # license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )
+
+    
