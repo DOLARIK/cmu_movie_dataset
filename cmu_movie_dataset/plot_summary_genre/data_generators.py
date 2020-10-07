@@ -51,7 +51,7 @@ class BaseDataGenerator(Sequence):
 		self.indices_genre = indices_genre
 
 		self.num_samples = len(self.movie_ids)
-		
+
 		self.batch_size = batch_size
 		self.shuffle = shuffle
 
@@ -78,7 +78,7 @@ class BaseDataGenerator(Sequence):
 		wiki_movie_ids, plot_summaries_dict = read_plot_summaries(path_to_plot_summaries)
 		movie_genres_dict, all_genres, genre_indices, indices_genre = read_movie_genre(path_to_movie_metadata)
 
-		plot_summaries_genres_dict = combine_plot_summaries_and_genres(wiki_movie_ids, 
+		wiki_movie_ids, plot_summaries_genres_dict = combine_plot_summaries_and_genres(wiki_movie_ids, 
 																plot_summaries_dict, movie_genres_dict)
 
 		return cls(wiki_movie_ids, plot_summaries_genres_dict, 
