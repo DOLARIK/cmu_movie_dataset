@@ -1,4 +1,6 @@
 from tensorflow.keras.utils import Sequence
+import tensorflow as tf
+
 import os
 from abc import abstractmethod
 
@@ -49,7 +51,7 @@ class BaseDataGenerator(Sequence):
 		self.indices_genre = indices_genre
 
 		self.num_samples = len(self.movie_ids)
-
+		
 		self.batch_size = batch_size
 		self.shuffle = shuffle
 
@@ -167,11 +169,10 @@ class BertDataGenerator(BaseDataGenerator):
 			def func_map(target):
 				encoded_target = np.zeros(len(self.all_genres))
 				for genre in target:
-					print(genre)
 					encoded_target[self.genre_indices[genre]] = 1
 				return encoded_target
 
-			return list(map(func_map, batch_y))
+			return tf.convert_to_tensor(np.asarray(list(map(func_map, batch_y))))
 
 	def set_tokenizer(self):
 		return BertTokenizer.from_pretrained('bert-base-uncased')
@@ -180,23 +181,23 @@ if __name__ == "__main__":
 	train_generator = BertDataGenerator.from_directory('../../MovieSummaries', 
 													validation_split = 0.2,
 													subset = 'training',
-													batch_size = 1)
+													batch_size = 32)
 	for train_batch in train_generator:
 		print(train_batch)
-		break
+		# break
 
 	print(len(train_generator))
 
 	valid_generator = BertDataGenerator.from_directory('../../MovieSummaries', 
 													validation_split = 0.2,
 													subset = 'validation',
-													batch_size = 1)
+													batch_size = 32)
 
 
 
 	for valid_batch in valid_generator:
 		print(valid_batch)
-		break
+		# break
 
 	print(len(valid_generator))
 
