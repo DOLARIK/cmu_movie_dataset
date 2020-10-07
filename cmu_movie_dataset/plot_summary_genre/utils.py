@@ -119,9 +119,10 @@ def combine_plot_summaries_and_genres(wiki_movie_ids, plot_summaries_dict, movie
 				'genres': movie_genres_dict[movie_id]
 			}
 		except Exception as e:
+			wiki_movie_ids.remove(movie_id)
 			('WARNING: No movie found with id:', e, 'in movie_genres_dict')
 
-	return plot_summaries_genre_dict
+	return wiki_movie_ids, plot_summaries_genre_dict
 
 def remove_tags(text):
 	"""Removes Tags
