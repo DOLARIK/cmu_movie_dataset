@@ -90,6 +90,7 @@ def movie_ids_subset(movie_ids, split):
 	# Returns:
 		movie_ids_subset: list, list of subset of movie ids
 	"""
+	movie_ids = sorted(movie_ids)
 	num_files = len(movie_ids)
 	start, stop = int(split[0] * num_files), int(split[1] * num_files)
 	return movie_ids[start: stop]
@@ -155,9 +156,9 @@ def clean_plot_summary(raw_plot_summary):
 if __name__ == "__main__":
 	movie_ids, plot_summaries_dict = read_plot_summaries('../../MovieSummaries/plot_summaries.txt')
 
-	genre_dict, all_genres = read_movie_genre('../../MovieSummaries/movie.metadata.tsv')
+	genre_dict, all_genres, _, _ = read_movie_genre('../../MovieSummaries/movie.metadata.tsv')
 
-	plot_summaries_genre_dict = combine_plot_summaries_and_genres(movie_ids, plot_summaries_dict, genre_dict)
+	_, plot_summaries_genre_dict = combine_plot_summaries_and_genres(movie_ids, plot_summaries_dict, genre_dict)
 
 	import random
 
