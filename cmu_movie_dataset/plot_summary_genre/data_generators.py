@@ -4,13 +4,14 @@ import tensorflow as tf
 import os
 from abc import abstractmethod
 
-from .utils import (read_plot_summaries, 
+from utils import (read_plot_summaries, 
 				   read_movie_genre,
 				   combine_plot_summaries_and_genres,
 				   clean_plot_summary, 
 				   movie_ids_subset)
 
-from transformers import (BertTokenizer)
+from transformers import (BertTokenizer,
+						  XLNetTokenizer)
 
 import numpy as np
 
@@ -177,8 +178,34 @@ class BertDataGenerator(BaseDataGenerator):
 	def set_tokenizer(self):
 		return BertTokenizer.from_pretrained('bert-base-uncased')
 
+class XLNetDataGenerator(BaseDataGenerator):
+	def __init__(self, *args, **kwargs):
+		super(XLNetDataGenerator, self).__init__(*args, **kwargs)
+
+	def _encode_features(self, batch_x):
+		return dict(self.tokenizer(batch_x, 
+								max_length = self.max_length,
+								padding = self.padding,
+								truncation = self.truncation,
+								return_tensors = 'tf'))
+
+	def _encode_targets(self, batch_y):
+		if self.target_encoder is not None:
+			return self.target_encoder(batch_y)
+		else:
+			def func_map(target):
+				encoded_target = np.zeros(len(self.all_genres))
+				for genre in target:
+					encoded_target[self.genre_indices[genre]] = 1
+				return encoded_target
+
+			return tf.convert_to_tensor(np.asarray(list(map(func_map, batch_y))))
+
+	def set_tokenizer(self):
+		return XLNetTokenizer.from_pretrained('xlnet-base-cased')
+
 if __name__ == "__main__":
-	train_generator = BertDataGenerator.from_directory('../../MovieSummaries', 
+	train_generator = XLNetDataGenerator.from_directory('../../MovieSummaries', 
 													validation_split = 0.2,
 													subset = 'training',
 													batch_size = 32)
@@ -188,7 +215,7 @@ if __name__ == "__main__":
 
 	print(len(train_generator))
 
-	valid_generator = BertDataGenerator.from_directory('../../MovieSummaries', 
+	valid_generator = XLNetDataGenerator.from_directory('../../MovieSummaries', 
 													validation_split = 0.2,
 													subset = 'validation',
 													batch_size = 32)
